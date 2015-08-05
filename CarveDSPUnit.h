@@ -1,7 +1,7 @@
 /*
  *	File:		CarveDSPUnit.h
  *
- *	Version:	0.01.00
+ *	Version:	0.01.01
  *
  *	Created:	17/01/2015
  *
@@ -23,12 +23,10 @@
  */
 
 #include "math.h"
+#include "MacTypes.h"
 
 #ifndef Carve_CarveDSPUnit_h
 #define Carve_CarveDSPUnit_h
-
-
-
 
 class CarveDSPUnit {
 private:
@@ -47,81 +45,33 @@ private:
     
     int mode;
     
-    // TODO: check if an int bounds check method is necessary of if float works for both
-    float boundsCheck(float param, float min, float max) {
-        if (param < min) param = min;
-        if (param > max) param = max;
-        
-        return param;
-    }
+    template<typename T>
+    T boundsCheck(T param, T min, T max);
     
-    Float32 processSine(Float32 inSample) {
-        return sin(M_PI * inSample * preGain + (misc * M_PI)) * postGain;
-    }
+    Float32 processSine(Float32 inSample) const;
     
-    Float32 processParabolicSoft(Float32 inSample) {
-        return (inSample * ((4 * misc) - sqrt((4 - preGain) * pow(inSample, 2))) * 0.5) * postGain;
-    }
+    Float32 processParabolicSoft(Float32 inSample) const;
     
-    Float32 processParabolicHard(Float32 inSample) {
-        return (atan(preGain * 4 * inSample + (misc * M_PI)) / 1.5) * postGain;
-    }
+    Float32 processParabolicHard(Float32 inSample) const;
     
-    Float32 processAsymmetricSine(Float32 inSample) {
-        return (cos(inSample * (misc + 1)) * atan(4 * inSample * preGain)) * postGain;
-    }
+    Float32 processAsymmetricSine(Float32 inSample) const;
     
-    Float32 processExponent(Float32 inSample) {
-        return (sin(misc * pow(M_E, (inSample + preGain)))) * postGain;
-    }
+    Float32 processExponent(Float32 inSample) const;
     
 public:
-    CarveDSPUnit(float preGainMin, float preGainMax, float postGainMin, float postGainMax, float miscMin, float miscMax, int modeMin, int modeMax) {
-        
-        kMinVal_PreGain = preGainMin;
-        kMaxVal_PreGain = preGainMax;
-        
-        kMinVal_PostGain = postGainMin;
-        kMaxVal_PostGain = postGainMax;
-        
-        kMinVal_Misc = miscMin;
-        kMaxVal_Misc = miscMax;
-        
-        kMinVal_Mode = modeMin;
-        kMaxVal_Mode = modeMax;
-    }
+    CarveDSPUnit(float preGainMin, float preGainMax, float postGainMin, float postGainMax, float miscMin, float miscMax, int modeMin, int modeMax);
     
     // set parameter methods, w/ integrated bounds checks
-    void setMode(int val) {
-        mode = val;
-        mode = boundsCheck(mode, kMinVal_Mode, kMaxVal_Mode);
-    }
+    void setMode(int val);
     
-    void setPreGain(Float32 val) {
-        preGain = val;
-        preGain = boundsCheck(preGain, kMinVal_PreGain, kMaxVal_PreGain);
-    }
+    void setPreGain(Float32 val);
     
-    void setPostGain(Float32 val) {
-        postGain = val;
-        postGain = boundsCheck(postGain, kMinVal_PostGain, kMaxVal_PostGain);
-    }
+    void setPostGain(Float32 val);
     
-    void setMisc(Float32 val) {
-        misc = val;
-        misc = boundsCheck(misc, kMinVal_Misc, kMaxVal_Misc);
-    }
+    void setMisc(Float32 val);
     
     // process methods
-    Float32 process(Float32 inSample) {
-        if (mode < 0.4) { return processSine(inSample); }
-        if (mode > 0.5 && mode < 1.4) { return processParabolicSoft(inSample); }
-        if (mode > 1.5 && mode < 2.4) { return processParabolicHard(inSample); }
-        if (mode > 2.5 && mode < 3.4) { return processAsymmetricSine(inSample); }
-        if (mode > 3.5 && mode < 4.4) { return processExponent(inSample); }
-        
-        return 0.0;
-    }
+    Float32 process (Float32 inSample) const;
 };
 
 #endif
