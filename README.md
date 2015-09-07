@@ -5,4 +5,4 @@ For more details and a download of the compiled plugin: http://whiteelephantaudi
 
 The GUI and Core Audio Libraries are not included in this repository.
 
-This repository will no longer be updated until Carve has been re-written for the JUCE framework.
+This repository will no longer be updated as Carve has been re-written for the JUCE framework. The new repository is available at: https://github.com/jd-13/Carve-Distortion
